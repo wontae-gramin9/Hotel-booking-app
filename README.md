@@ -2,36 +2,149 @@
 
 Jul 2024 - Sep 2024  
 
+## Preview
 
-# Notice
+![localhost_5173_dashboard (1)](https://github.com/user-attachments/assets/f3a0a2bb-bb36-4576-b72d-07fef18aa331)
+
+
+[Application URL, click and explore!](https://hotelbooking-oqevfug02-wontae-chois-projects-63012546.vercel.app)
+
+### Notice
 
 **Login credentials**
-test@test.com
-test1234
+
+Id: test@test.com <br/>
+Password: test1234
+
+## Purpose of the Project
+
+**Booking management application for hotel staff**
+
+This project was developed while following the [Udemy course](https://www.udemy.com/course/the-ultimate-react-course). 
+
+After transitioning back from Flutter to the JavaScript ecosystem, The goal was to build an app utilizing the commonly used and conventional libraries in React.
+
+## Tech Stack
+
+- React.js
+- Supabase database, storage, email authentication and row level security
+- React query
+- React-router-dom(dynamic routing with search URL and path, nested routing)
+- Context API (darkmode implementation & compound components)
+- Rechart
+- React-hook-form
+- Styled components
 
 ## Contributions
 
 **Overview**
-프로젝트 소개
-현재 진영에서... 내가 배우려고 했던 것
-스크럼이나 업무 분담을 한 방식을 표현해준다.
+
+A dashboard app for hotel staff to manage bookings.  
+
+The dashboard includes charts providing an overview of booking status, and an interface to quickly process check-ins/check-outs for the current day.
 
 **Contributions**
 
-Following Udemy class
+Although I followed the Udemy course, I actively developed features on my own. For example, I would pause the videos to implement features first or modify the data fetched from the server into an appropriate structure for the client.
 
-## Purpose of the Project
+Each task was committed separately, with commits organized for easy reference to library usage or when a feature was completed.
 
-프로젝트의 목적과 목표를 간단하게 소개한다 만약 있다면 왜 이러한 프로젝트를 선택했는 지도 작성해주면 좋다. 그리고 프로젝트를 진행하면서 어떤 방식으로 업무 공유했는지도 쓰면 좋을 것 같다.
+**Commit history**
+![Commit history](https://github.com/user-attachments/assets/ba7b0d82-1f2c-41b2-93a5-c9b7979a505f)
 
-# 기술 스택
+## Main Features
 
-서류심사의 경우, 담당자가 개발자가 아닌 경우도 많은 것 같다. 그들은 당신이 어떤 기술을 썼는지 모르는 경우가 많다. 그런 경우가 아니라도 많은 지원자의 서류를 확인해야 하는 경우 눈에 들어오게 작성해놓으면 유리하다.
+1. Supabase email OAuth and image storage.
+2. Visualization and charts showing check-in status, revenue, and booking rates based on room availability.
+3. Ability to process check-ins/check-outs for today's bookings from the dashboard.
+4. Detailed booking page displaying guest information, check-in/check-out dates, room details, breakfast inclusion, etc.
+5. Cabin dashboard where cabins can be sorted by price or capacity, with options to edit, add, or delete room information.
+6. Ability to create hotel staff accounts.
+7. Modifying global hotel system settings, such as minimum/maximum nights, maximum guests, and breakfast prices.
 
-# 아키텍처
 
-프로젝트의 아키텍처를 그림이나 사진으로 표현하여 첨부한다.
+## Key Learnings and Takeaways
 
-# 그외
+**How to decouple component state with compound components**
 
-향후 계획, 프로젝트를 통해 배운점, 프로젝트에서 문제점을 해결한 과정, 프로젝트의 개선점, 확장성등을 이야기 해도 된다.
+Typically, when managing the visibility of components like modals or hamburgers, the state (e.g., `isModalOpen`) must be controlled in the parent component, leading to the state being tightly coupled.
+
+
+```js
+export default function Parent({ children }) {
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  return (
+    <Modal onClose={setIsModalOpen((isModalOpen) => !isModalOpen)}>
+      <Content />
+    </Modal>
+  );
+}
+```
+
+Compound components, on the other hand, use Context API, allowing the open/close logic of the modal to be handled within the modal itself, rather than in the parent component.
+
+```js
+export default function Modal({ children }) {
+  const [openName, setOpenName] = useState("");
+  const open = (openName) => setOpenName(openName);
+  const close = () => setOpenName("");
+  return (
+    <ModalContext.Provider
+      value={{
+        openName,
+        open,
+        close,
+      }}
+    >
+      {children}
+    </ModalContext.Provider>
+  );
+}
+export function Open({ ModalOpeningComponent, openWindowName }) {
+  const { open } = useContext(ModalContext);
+  // How to add event handler to a component   
+  // https://react.dev/reference/react/cloneElement
+  return cloneElement(ModalOpeningComponent, { onClick: () => open(openWindowName) });
+}
+
+export function Window({ Content, name }) {
+  const { openName, close } = useContext(ModalContext);
+
+  if (name !== openName) return null;
+    // Managing openName as a global state with Context API ensures that only one modal can be displayed at a time across the entire app.
+  return createPortal(
+     <WindowContainer>
+        <Button onClick={close}>
+          Close Modal
+        </Button>
+         {/*
+         If you want a button inside the Content component to also trigger the close 
+         action when clicked, pass the onCloseModal prop to all components rendered as Content. Then, simply assign onClick={onCloseModal} to the button you want to trigger the close action.
+         */}
+        {cloneElement(Content, { onCloseModal: close })}
+      </WindowContainer>,
+     // createPortal changes the physical placement of the DOM node into the first child of document.body to avoid potential overlay CSS conflicts.
+    document.body 
+  );
+}
+
+Modal.Open = Open;
+Modal.Window = Window;
+```
+
+This approach decouples the modal's state from the parent, making it unnecessary for the parent to manage the modal's open state.
+
+```js
+export default function Parent({ children }) {
+  return (
+   <Modal>
+      <Modal.Open openWindowName="contentName">
+         <Button>Open Content</Button>
+      </Modal.Open>
+      <Modal.Window name="contentName">
+         <Content/>
+      </Modal.Window>
+   </Modal>
+  );
+}
+```
