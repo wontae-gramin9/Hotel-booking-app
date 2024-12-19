@@ -30,6 +30,9 @@
     "@vitejs/plugin-react": "^4.0.3",
     "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",
+    "source-map-loader": "^5.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
     "vite": "^4.4.5",
     "vite-plugin-eslint": "^1.8.1"
   }
