@@ -1,5 +1,4 @@
-import React from "react";
-import ButtonIcon from "./ButtonIcon";
+import ButtonIcon from "@/ui/ButtonIcon";
 import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi2";
 import { useDarkMode } from "@/context/DarkModeContext";
 

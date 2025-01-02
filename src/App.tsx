@@ -13,7 +13,7 @@ import Account from "./pages/Account";
 import Login from "./pages/Login";
 import PageNotFound from "./pages/PageNotFound";
 import Checkin from "./pages/Checkin";
-import AppLayout from "./ui/AppLayout";
+import AppLayout from "@/ui/AppLayout";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { DarkModeProvider } from "@/context/DarkModeContext";
