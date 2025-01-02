@@ -1,15 +1,20 @@
 import React, { createContext, useContext, useEffect } from "react";
-import { useLocalStorageState } from "./../hooks/useLocalStorageState";
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
 
-const DarkModeContext = createContext();
+type DarkModeContextType = {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+};
 
-function DarkModeProvider({ children }) {
+const DarkModeContext = createContext<DarkModeContextType | null>(null);
+
+function DarkModeProvider({ children }: { children: React.ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useLocalStorageState(
     window.matchMedia("(prefers-color-scheme: dark)").matches,
     "isDarkMode"
   );
   function toggleDarkMode() {
-    setIsDarkMode((isDark) => !isDark);
+    setIsDarkMode((isDark: boolean) => !isDark);
   }
 
   useEffect(() => {
@@ -31,7 +36,8 @@ function DarkModeProvider({ children }) {
 
 function useDarkMode() {
   const context = useContext(DarkModeContext);
-  if (context === undefined)
+  if (context === null)
+    // createContext의 기본값을 null로 잡았으므로 undefined에서 null로 수정
     throw new Error("DarkModeContext was used outside of DarkModeProvider");
   return context;
 }
