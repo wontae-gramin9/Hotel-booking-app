@@ -1,6 +1,15 @@
-import supabase, { supabaseUrl } from "./supabase";
+import supabase, { supabaseUrl } from "@/services/supabase";
+import { UserAttributes } from "@supabase/supabase-js";
 
-export async function signup({ fullName, email, password }) {
+type UserCredentials = UserAttributes & {
+  email: string;
+  password: string;
+  fullName: string;
+  avatar: string;
+};
+
+// union이 아니라 UserAttributes를 상속받게 하려면 어떻게 해?
+export async function signup({ fullName, email, password }: UserCredentials) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -17,7 +26,7 @@ export async function signup({ fullName, email, password }) {
   return data;
 }
 
-export async function login({ email, password }) {
+export async function login({ email, password }: UserCredentials) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -49,7 +58,11 @@ export async function logout() {
   if (error) throw new Error(error.message);
 }
 
-export async function updateCurrentUser({ password, fullName, avatar }) {
+export async function updateCurrentUser({
+  password,
+  fullName,
+  avatar,
+}: UserCredentials) {
   // 1. Update password OR fullName
   let updateData;
   if (password) updateData = { password };
@@ -59,7 +72,10 @@ export async function updateCurrentUser({ password, fullName, avatar }) {
         fullName,
       },
     };
-  const { data, error } = await supabase.auth.updateUser(updateData);
+  const { data, error } = await supabase.auth.updateUser(
+    updateData as UserAttributes
+    // UserAttributes 내부에 user의 metadata를 담기위한 data key가 있다.
+  );
   if (error) throw new Error(error.message);
 
   if (!avatar) return data;
@@ -77,6 +93,6 @@ export async function updateCurrentUser({ password, fullName, avatar }) {
         avatar: `${supabaseUrl}/storage/v1/object/public/avatars/${fileName}`,
       },
     });
-  if (userUpdateError) throw new Error(storageError.message);
+  if (userUpdateError) throw new Error(userUpdateError.message);
   return updatedUser;
 }
