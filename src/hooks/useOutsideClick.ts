@@ -1,12 +1,15 @@
 import { useRef, useEffect } from "react";
 
-export function useOutsideClick(handler, listenCapturing = true) {
-  const ref = useRef();
+export function useOutsideClick(handler: () => void, listenCapturing = true) {
+  const ref = useRef<HTMLElement>();
   // DOM Ref를 쓰면, ref.current값은 진짜 html tag값이 된다.
 
   useEffect(() => {
-    function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        // [TS Migration] React.MouseEvent는 JSX에서만 사용됨, document에 달 거면 MouseEvent가 맞다
+        // e.target의 타입은 EventTarget인데, Dom요소보다 더 넓은 타입이므로 Node로 타입 단언을 해줘야 한다.
+
         // html tag에 contains(): StyledModal이 클릭된 타겟을 contains하는가? → 자식으로 가지고 있는가?
         // Array에서 값이 있는가는 includes(), 헷갈림
         handler();

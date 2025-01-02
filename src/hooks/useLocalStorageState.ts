@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export function useLocalStorageState(initialState, key) {
+export function useLocalStorageState(initialState: boolean, key: string) {
   // lazy state initialization
   const [value, setValue] = useState(function () {
     const storedValue = localStorage.getItem(key);
