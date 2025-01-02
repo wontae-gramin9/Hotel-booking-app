@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
-
+    // 경로 별칭 설정
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     // TS Migration
-    "outDir": "./dist/",        // path to output directory
-    "sourceMap": true,          // allow sourcemap support
-    "strictNullChecks": true,   // enable strict null checks as a best practice
+    "outDir": "./dist/", // path to output directory
+    "sourceMap": true, // allow sourcemap support
+    "strictNullChecks": true, // enable strict null checks as a best practice
     "jsx": "react-jsx",
-    "allowJs": true   ,
+    "allowJs": true,
     "module": "ESNext",
     "target": "ES2020",
 

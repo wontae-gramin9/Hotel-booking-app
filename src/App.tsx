@@ -16,7 +16,7 @@ import Checkin from "./pages/Checkin";
 import AppLayout from "./ui/AppLayout";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
-import { DarkModeProvider } from "./context/DarkModeContext";
+import { DarkModeProvider } from "@/context/DarkModeContext";
 
 // context API와 redux와 비슷하게 data가 살고있는 Client를 만든다
 const queryClient = new QueryClient({
