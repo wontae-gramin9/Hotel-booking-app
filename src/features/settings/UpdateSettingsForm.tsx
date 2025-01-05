@@ -1,9 +1,10 @@
-import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow.tsx";
-import Input from "../../ui/Input.tsx";
+import Form from "@/ui/Form";
+import FormRow from "@/ui/FormRow";
+import Input from "@/ui/Input";
+import Spinner from "@/ui/Spinner";
 import { useSetting } from "./useSetting";
 import { useUpdateSetting } from "./useUpdateSetting";
-import Spinner from "./../../ui/Spinner";
+import { FormEvent } from "react";
 
 function UpdateSettingsForm() {
   const {
@@ -11,7 +12,8 @@ function UpdateSettingsForm() {
     settings: {
       minBookingLength,
       maxBookingLength,
-      maxGuestsPerBooking,
+      // [TsMirgation]max가 아니라 minGuestsPerBooking이었음. 사용되지 않아서 몰랐던 것
+      minGuestsPerBooking,
       breakfastPrice,
     } = {}, // undefined일때 default value로, null은 할당된 값이라 undefined만 된다
   } = useSetting();
@@ -19,8 +21,8 @@ function UpdateSettingsForm() {
 
   const { isUpdating, updateSetting } = useUpdateSetting();
 
-  function handleUpdate(e, field) {
-    const { value } = e.target;
+  function handleUpdate(e: FormEvent<HTMLInputElement>, field: string) {
+    const { value } = e.currentTarget;
     if (!value) return;
     updateSetting({ [field]: value });
   }
@@ -33,7 +35,7 @@ function UpdateSettingsForm() {
         <Input
           type="number"
           id="min-nights"
-          defaultValue={minBookingLength}
+          defaultValue={minBookingLength!}
           disabled={isUpdating}
           onBlur={(e) => handleUpdate(e, "minBookingLength")}
         />
@@ -42,7 +44,7 @@ function UpdateSettingsForm() {
         <Input
           type="number"
           id="max-nights"
-          defaultValue={maxBookingLength}
+          defaultValue={maxBookingLength!}
           disabled={isUpdating}
           onBlur={(e) => handleUpdate(e, "maxBookingLength")}
         />
@@ -51,16 +53,16 @@ function UpdateSettingsForm() {
         <Input
           type="number"
           id="max-guests"
-          defaultValue={maxGuestsPerBooking}
+          defaultValue={minGuestsPerBooking!}
           disabled={isUpdating}
-          onBlur={(e) => handleUpdate(e, "maxGuestsPerBooking")}
+          onBlur={(e) => handleUpdate(e, "minGuestsPerBooking")}
         />
       </FormRow>
       <FormRow label="Breakfast price">
         <Input
           type="number"
           id="breakfast-price"
-          defaultValue={breakfastPrice}
+          defaultValue={breakfastPrice!}
           disabled={isUpdating}
           onBlur={(e) => handleUpdate(e, "breakfastPrice")}
         />

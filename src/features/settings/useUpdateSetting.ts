@@ -14,7 +14,7 @@ export function useUpdateSetting() {
         queryKey: ["settings"],
       });
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err: Error) => toast.error(err.message),
   });
   return { isUpdating, updateSetting };
 }
