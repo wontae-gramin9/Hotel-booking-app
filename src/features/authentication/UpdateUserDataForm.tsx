@@ -1,27 +1,27 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
-import Button from "../../ui/Button";
+import Button from "@/ui/Button";
 import FileInput from "../../ui/FileInput";
-import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow";
+import Form from "@/ui/Form";
+import FormRow from "../../ui/FormRow.tsx";
 import Input from "../../ui/Input";
 
 import { useUser } from "./useUser";
 import { useUpdateUser } from "./useUpdateUser";
+import { User } from "@supabase/supabase-js";
 
 function UpdateUserDataForm() {
-  // We don't need the loading state, and can immediately use the user data, because we know that it has already been loaded at this point
+  const { user } = useUser();
   const {
-    user: {
-      email,
-      user_metadata: { fullName: currentFullName },
-    },
-  } = useUser();
+    email,
+    user_metadata: { fullName: currentFullName },
+  } = user as User;
+  // [TsMigration] We don't need the loading state or type guarding, and can immediately use the user data, because we know that it has already been loaded at this point
   const { updateUser, isUpdating } = useUpdateUser();
   const [fullName, setFullName] = useState(currentFullName);
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState<File | null>(null);
 
-  function handleSubmit(e) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (fullName)
       updateUser(
@@ -29,7 +29,8 @@ function UpdateUserDataForm() {
         {
           onSuccess: () => {
             setAvatar(null);
-            e.target.reset();
+            const form = e.target as HTMLFormElement;
+            form.reset();
           },
         }
       );
@@ -38,6 +39,13 @@ function UpdateUserDataForm() {
   function handleCancel() {
     setFullName(currentFullName);
     setAvatar(null);
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (files && files[0]) {
+      setAvatar(files[0]);
+    }
   }
 
   return (
@@ -55,11 +63,7 @@ function UpdateUserDataForm() {
         />
       </FormRow>
       <FormRow label="Avatar image">
-        <FileInput
-          id="avatar"
-          accept="image/*"
-          onChange={(e) => setAvatar(e.target.files[0])}
-        />
+        <FileInput id="avatar" accept="image/*" onChange={handleFileChange} />
       </FormRow>
       <FormRow>
         <Button

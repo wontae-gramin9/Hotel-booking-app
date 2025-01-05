@@ -1,15 +1,15 @@
 import supabase, { supabaseUrl } from "@/services/supabase";
 import { UserAttributes } from "@supabase/supabase-js";
 
-type UserCredentials = UserAttributes & {
+export async function signup({
+  fullName,
+  email,
+  password,
+}: {
+  fullName: string;
   email: string;
   password: string;
-  fullName: string;
-  avatar: string;
-};
-
-// union이 아니라 UserAttributes를 상속받게 하려면 어떻게 해?
-export async function signup({ fullName, email, password }: UserCredentials) {
+}) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -26,7 +26,13 @@ export async function signup({ fullName, email, password }: UserCredentials) {
   return data;
 }
 
-export async function login({ email, password }: UserCredentials) {
+export async function login({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -62,7 +68,12 @@ export async function updateCurrentUser({
   password,
   fullName,
   avatar,
-}: UserCredentials) {
+}: {
+  fullName: string;
+  // [TsMigration] UpdateUserDataForm에서 사용하는 방식때문임
+  password?: string;
+  avatar: File | null;
+}) {
   // 1. Update password OR fullName
   let updateData;
   if (password) updateData = { password };

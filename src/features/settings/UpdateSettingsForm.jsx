@@ -1,5 +1,5 @@
 import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow";
+import FormRow from "../../ui/FormRow.tsx";
 import Input from "../../ui/Input";
 import { useSetting } from "./useSetting";
 import { useUpdateSetting } from "./useUpdateSetting";

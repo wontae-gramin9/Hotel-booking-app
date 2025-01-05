@@ -1,4 +1,4 @@
-import React from "react";
+import React, { isValidElement } from "react";
 import { styled } from "styled-components";
 
 const StyledFormRow = styled.div`
@@ -37,10 +37,26 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-export default function FormRow({ label, error, children }) {
+export default function FormRow({
+  label,
+  error,
+  children,
+}: {
+  label?: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  let htmlFor = "";
+
+  // children이 props를 가지고 있는 input일 때
+  if (isValidElement(children) && "type" in children.props) {
+    htmlFor = children.props.type; // 안전하게 type에 접근
+  }
+  // input type이 아닌 button, div가 들어올 때
+
   return (
     <StyledFormRow>
-      {label && <Label htmlFor={children.props.type}>{label}</Label>}
+      {label && <Label htmlFor={htmlFor}>{label}</Label>}
       {children}
       {error && <Error>{error}</Error>}
     </StyledFormRow>

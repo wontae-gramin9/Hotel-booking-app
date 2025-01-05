@@ -1,10 +1,14 @@
 import styled, { css } from "styled-components";
 
+type FormProps = {
+  type?: "modal" | "regular";
+};
+
 // Form이 modal에서 쓰이냐 modal없이 쓰이냐에 따라
 // 외부패딩같은 css를 조건제어하기위해
 // Styled component인 Form에 type prop을 주면
 // 그에 따라 css를 선택
-const Form = styled.form`
+const Form = styled.form<FormProps>`
   ${(props) =>
     props.type !== "modal" &&
     css`
@@ -27,7 +31,7 @@ const Form = styled.form`
 `;
 
 Form.defaultProps = {
-  tpye: "regular",
+  type: "regular",
 };
 
 export default Form;
