@@ -1,26 +1,34 @@
 import { useForm } from "react-hook-form";
-import Button from "../../ui/Button";
-import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow.tsx";
-import Input from "../../ui/Input";
+import Button from "@/ui/Button";
+import Form from "@/ui/Form";
+import FormRow from "@/ui/FormRow";
+import Input from "@/ui/Input";
+import { useUpdateUser } from "@/features/authentication/useUpdateUser";
 
-import { useUpdateUser } from "./useUpdateUser";
+// [TsMigration] useForm으로
+type UpdatePasswordFormData = {
+  password: string;
+  passwordConfirm: string;
+};
 
 function UpdatePasswordForm() {
-  const { register, handleSubmit, formState, getValues, reset } = useForm();
+  const { register, handleSubmit, formState, getValues, reset } =
+    useForm<UpdatePasswordFormData>();
   const { errors } = formState;
 
   const { updateUser, isUpdating } = useUpdateUser();
 
-  function onSubmit({ password }) {
-    updateUser({ password }, { onSuccess: reset });
+  function onSubmit({ password }: { password: string }) {
+    // [TsMigration] 메소드를 그냥 전달했을떄 타입에러가 지랄같이 나오면
+    // 우선 () => method()를 실행해보면 좋다
+    updateUser({ password }, { onSuccess: () => reset() });
   }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormRow
         label="New password (min 8 characters)"
-        error={errors?.password?.message}
+        error={errors?.password?.message as string}
       >
         <Input
           type="password"
@@ -39,7 +47,7 @@ function UpdatePasswordForm() {
 
       <FormRow
         label="Confirm password"
-        error={errors?.passwordConfirm?.message}
+        error={errors?.passwordConfirm?.message as string}
       >
         <Input
           type="password"
@@ -54,7 +62,7 @@ function UpdatePasswordForm() {
         />
       </FormRow>
       <FormRow>
-        <Button onClick={reset} type="reset" variation="secondary">
+        <Button onClick={() => reset()} type="reset" variation="secondary">
           Cancel
         </Button>
         <Button disabled={isUpdating}>Update password</Button>

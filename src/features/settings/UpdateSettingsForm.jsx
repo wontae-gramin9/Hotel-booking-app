@@ -1,6 +1,6 @@
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow.tsx";
-import Input from "../../ui/Input";
+import Input from "../../ui/Input.tsx";
 import { useSetting } from "./useSetting";
 import { useUpdateSetting } from "./useUpdateSetting";
 import Spinner from "./../../ui/Spinner";

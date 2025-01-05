@@ -1,7 +1,7 @@
 import Button from "../../ui/Button";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow.tsx";
-import Input from "../../ui/Input";
+import Input from "../../ui/Input.tsx";
 import { useForm } from "react-hook-form";
 import { useSignup } from "./useSignup";
 
