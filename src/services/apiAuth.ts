@@ -69,10 +69,10 @@ export async function updateCurrentUser({
   fullName,
   avatar,
 }: {
-  fullName: string;
+  fullName?: string;
   // [TsMigration] UpdateUserDataForm에서 사용하는 방식때문임
   password?: string;
-  avatar: File | null;
+  avatar?: File;
 }) {
   // 1. Update password OR fullName
   let updateData;

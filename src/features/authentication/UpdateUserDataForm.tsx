@@ -19,7 +19,7 @@ function UpdateUserDataForm() {
   // [TsMigration] We don't need the loading state or type guarding, and can immediately use the user data, because we know that it has already been loaded at this point
   const { updateUser, isUpdating } = useUpdateUser();
   const [fullName, setFullName] = useState(currentFullName);
-  const [avatar, setAvatar] = useState<File | null>(null);
+  const [avatar, setAvatar] = useState<File | undefined>(undefined);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,7 +28,7 @@ function UpdateUserDataForm() {
         { fullName, avatar },
         {
           onSuccess: () => {
-            setAvatar(null);
+            setAvatar(undefined);
             const form = e.target as HTMLFormElement;
             form.reset();
           },
@@ -38,7 +38,7 @@ function UpdateUserDataForm() {
 
   function handleCancel() {
     setFullName(currentFullName);
-    setAvatar(null);
+    setAvatar(undefined);
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
