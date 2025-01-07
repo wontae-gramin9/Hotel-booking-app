@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { createContext } from "react";
 import styled from "styled-components";
 
@@ -11,7 +11,11 @@ const StyledTable = styled.div`
   overflow: hidden;
 `;
 
-const CommonRow = styled.div`
+type CommonRowProps = {
+  columns: string;
+};
+
+const CommonRow = styled.div<CommonRowProps>`
   display: grid;
   grid-template-columns: ${(props) => props.columns};
   column-gap: 2.4rem;
@@ -61,9 +65,19 @@ const Empty = styled.p`
   margin: 2.4rem;
 `;
 
-const TableContext = createContext();
+type TableContextType = {
+  columns: string;
+};
 
-export default function Table({ columns, children }) {
+const TableContext = createContext<TableContextType | null>(null);
+
+export default function Table({
+  columns,
+  children,
+}: {
+  columns: string;
+  children: React.ReactNode;
+}) {
   return (
     <TableContext.Provider value={{ columns }}>
       <StyledTable role="table">{children}</StyledTable>
@@ -71,25 +85,54 @@ export default function Table({ columns, children }) {
   );
 }
 
-function Header({ children }) {
-  const { columns } = useContext(TableContext);
+function Header({
+  children,
+  role,
+}: {
+  children: React.ReactNode;
+  role: "row" | "column";
+}) {
+  const context = useContext(TableContext);
+  if (context === null)
+    throw new Error("TableContext was used outside of Table");
+  const { columns } = context;
   return (
-    <StyledHeader role="row" as="header" columns={columns}>
+    <StyledHeader role={role} as="header" columns={columns}>
       {children}
     </StyledHeader>
   );
 }
-function Row({ children }) {
-  const { columns } = useContext(TableContext);
+function Row({
+  children,
+  role,
+}: {
+  children: React.ReactNode;
+  role: "row" | "column";
+}) {
+  const context = useContext(TableContext);
+  if (context === null)
+    throw new Error("TableContext was used outside of Table");
+  const { columns } = context;
   return (
-    <StyledRow role="row" columns={columns}>
+    <StyledRow role={role} columns={columns}>
       {children}
     </StyledRow>
   );
 }
-function Body({ data, render }) {
+
+// [TsMigration] data 타입이 그대로 render method의 args로 들어가기 때문에 Generic 사용해보자
+type BodyProps<T> = {
+  data: T[];
+  render: (item: T) => React.ReactNode;
+};
+
+// 컴포넌트에도 <T>를 추가하는 이유:
+// 제너릭 타입 <T>를 컴포넌트의 범위에서 사용할 수 있기 위함이다
+// <T>가 없으면, 해당 컴포넌트는 BodyProps<T>의 T가 어디서 왔는지 모른다
+// 컴포넌트가 <T>를 받아야 한다.
+function Body<T>({ data, render }: BodyProps<T>) {
   if (!data.length) return <Empty>No data to show at the moment</Empty>;
-  return <StyledBody row="row">{data.map(render)}</StyledBody>;
+  return <StyledBody>{data.map(render)}</StyledBody>;
 }
 
 Table.Header = Header;

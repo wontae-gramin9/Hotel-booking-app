@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 
 export function useOutsideClick(handler: () => void, listenCapturing = true) {
-  const ref = useRef<HTMLElement>();
+  const ref = useRef<HTMLElement | null>(null);
   // DOM Ref를 쓰면, ref.current값은 진짜 html tag값이 된다.
 
   useEffect(() => {
@@ -31,4 +31,8 @@ export function useOutsideClick(handler: () => void, listenCapturing = true) {
   }, [handler, listenCapturing]);
 
   return ref;
+  // [TsMigration]
+  // React의 ref는 LegacyRef<T> 또는 MutableRefObject<T>로 기대되며, 여기서 T는 구체적인 타입이어야 합니다.
+  // HTMLElement는 HTMLDivElement나 HTMLUListElement의 상위 타입이므로, React는 이를 더 구체적인 타입으로 안전하게 캐스팅할 수 없다고 판단합니다.
+  // 이는 타입 안정성을 강화하기 위한 TypeScript의 설계입니다.
 }

@@ -1,10 +1,10 @@
 import Spinner from "@/ui/Spinner";
-import Table from "../../ui/Table";
-import Menus from "../../ui/Menus";
+import Table from "@/ui/Table";
+import Menus from "@/ui/Menus";
+import Empty from "@/ui/Empty";
 import CabinRow from "./CabinRow";
 import { useCabins } from "./useCabins";
 import { useSearchParams } from "react-router-dom";
-import Empty from "@/ui/Empty";
 
 export default function CabinTable() {
   const { isLoading, cabins } = useCabins();

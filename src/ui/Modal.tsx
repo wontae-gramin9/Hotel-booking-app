@@ -53,11 +53,17 @@ const Button = styled.button`
   }
 `;
 
-const ModalContext = createContext();
+type ModalContextType = {
+  openName: string;
+  open: (openName: string) => void;
+  close: () => void;
+};
 
-export default function Modal({ children }) {
+const ModalContext = createContext<ModalContextType | null>(null);
+
+export default function Modal({ children }: { children: React.ReactNode }) {
   const [openName, setOpenName] = useState("");
-  const open = (openName) => setOpenName(openName);
+  const open = (openName: string) => setOpenName(openName);
   const close = () => setOpenName("");
   return (
     <ModalContext.Provider
@@ -72,21 +78,39 @@ export default function Modal({ children }) {
   );
 }
 
-export function Open({ children, openWindowName }) {
-  const { open } = useContext(ModalContext);
+export function Open({
+  openWindowName,
+  children,
+}: {
+  openWindowName: string;
+  children: React.ReactElement;
+}) {
+  const context = useContext(ModalContext);
+  if (context === null)
+    throw new Error("ModalContext was used outside of Modal");
+  const { open } = context;
   // Button이 children으로 들어올텐데, 어떻게 open event handler를 달아주지?
   // https://react.dev/reference/react/cloneElement
   return cloneElement(children, { onClick: () => open(openWindowName) });
 }
 
-export function Window({ children, name }) {
-  const { openName, close } = useContext(ModalContext);
+export function Window({
+  children,
+  name,
+}: {
+  children: React.ReactElement;
+  name: string;
+}) {
+  const context = useContext(ModalContext);
+  if (context === null)
+    throw new Error("ModalContext was used outside of Modal");
+  const { openName, close } = context;
   const ref = useOutsideClick(close);
 
   if (name !== openName) return null;
   return createPortal(
     <Overlay>
-      <StyledModal ref={ref}>
+      <StyledModal ref={ref as React.RefObject<HTMLDivElement>}>
         <Button onClick={close}>
           <HiXMark />
         </Button>
