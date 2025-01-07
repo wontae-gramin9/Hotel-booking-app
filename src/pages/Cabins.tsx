@@ -1,8 +1,8 @@
 import CabinTable from "../features/cabins/CabinTable";
-import Heading from "../ui/Heading";
-import Row from "../ui/Row";
+import Heading from "@/ui/Heading";
+import Row from "@/ui/Row";
 import AddCabin from "../features/cabins/AddCabin";
-import CabinTableOperations from "./../features/cabins/CabinTableOperations";
+import CabinTableOperations from "../features/cabins/CabinTableOperations";
 
 function Cabins() {
   // Pages 컴포넌트는 어떤 state도 없이 깔끔하길 원하기에

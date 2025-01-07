@@ -1,7 +1,6 @@
-import React from "react";
 import TableOperations from "../../ui/TableOperations";
-import Filter from "../../ui/Filter";
-import SortBy from "../../ui/SortBy";
+import Filter from "@/ui/Filter";
+import SortBy from "@/ui/SortBy";
 
 export default function CabinTableOperations() {
   return (

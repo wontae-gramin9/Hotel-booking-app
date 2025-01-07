@@ -30,18 +30,20 @@ export function useBookings() {
 
   // PRE-FETCHING
   // 마지막 페이지에서 page+1을 하면 null 데이터를 받는다
-  const pageCount = Math.ceil(count / PAGE_SIZE);
-  if (page < pageCount) {
-    queryClient.prefetchQuery({
-      queryKey: ["bookings", filter, sortBy, page + 1],
-      queryFn: () => getBookings({ filter, sortBy, page: page + 1 }),
-    });
-  }
-  if (page > 1) {
-    queryClient.prefetchQuery({
-      queryKey: ["bookings", filter, sortBy, page - 1],
-      queryFn: () => getBookings({ filter, sortBy, page: page - 1 }),
-    });
+  if (count) {
+    const pageCount = Math.ceil(count / PAGE_SIZE);
+    if (page < pageCount) {
+      queryClient.prefetchQuery({
+        queryKey: ["bookings", filter, sortBy, page + 1],
+        queryFn: () => getBookings({ filter, sortBy, page: page + 1 }),
+      });
+    }
+    if (page > 1) {
+      queryClient.prefetchQuery({
+        queryKey: ["bookings", filter, sortBy, page - 1],
+        queryFn: () => getBookings({ filter, sortBy, page: page - 1 }),
+      });
+    }
   }
   return { isLoading, bookings, count };
 }

@@ -1,4 +1,5 @@
 import supabase, { supabaseUrl } from "./supabase";
+import type { Cabin } from "@/types/cabin";
 
 export async function getCabins() {
   const { data, error } = await supabase.from("cabins").select("*");
@@ -9,7 +10,7 @@ export async function getCabins() {
   return data;
 }
 
-export async function createEditCabin(newCabin, id) {
+export async function createEditCabin(newCabin: Cabin, id) {
   // https://kavvwqrrjwpiuwwrghit.supabase.co/storage/v1/object/public/cabin-images/cabin-001.jpg
   const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
 
