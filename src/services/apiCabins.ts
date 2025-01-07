@@ -10,14 +10,13 @@ export async function getCabins() {
   return data;
 }
 
-export async function createEditCabin(newCabin: Cabin, id) {
+export async function createEditCabin(newCabin: Cabin, id: number) {
   // https://kavvwqrrjwpiuwwrghit.supabase.co/storage/v1/object/public/cabin-images/cabin-001.jpg
   const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
 
-  const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll(
-    "/",
-    ""
-  );
+  // [TsMigration] replaceAll 메서드는 ES2021(ES12)에서 도입된 String.prototype
+  // tsconfig.json 파일의 compilerOptions.lib 옵션에 es2021을 추가해야 함
+  const imageName = `${Math.random()}-${newCabin.image}`.replaceAll("/", "");
   const imagePath = hasImagePath
     ? newCabin.image
     : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
