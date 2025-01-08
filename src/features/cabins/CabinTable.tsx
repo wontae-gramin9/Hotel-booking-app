@@ -5,15 +5,16 @@ import Empty from "@/ui/Empty";
 import CabinRow from "./CabinRow";
 import { useCabins } from "./useCabins";
 import { useSearchParams } from "react-router-dom";
+import { Cabin, NumericFieldOfCabin } from "@/types/cabin";
 
 export default function CabinTable() {
   const { isLoading, cabins } = useCabins();
   const [searchParams] = useSearchParams();
   if (isLoading) return <Spinner />;
-  if (!cabins.length) return <Empty resourceName="cabins" />;
+  if (!cabins?.length) return <Empty resourceName="cabins" />;
   // 삼항연산자 안 써도 앞이 null value면 바로 뒤값을 보여주는 short circuiting
   const filterValue = searchParams.get("discount") || "all";
-  let filteredCabins;
+  let filteredCabins: Cabin[];
   switch (filterValue) {
     case "all":
       filteredCabins = cabins;
@@ -25,11 +26,15 @@ export default function CabinTable() {
       filteredCabins = cabins.filter((cabin) => cabin.discount > 0);
       break;
     default:
+      // [TsMigration] Definite Assignment Assertion
+      // Default에서도 filteredCabins를 초기화해줘야 한다
+      filteredCabins = cabins;
       break;
   }
 
   const sortBy = searchParams.get("sortBy") || "name-asc";
-  const [field, direction] = sortBy.split("-");
+  // [TsMigration] field가 Cabin의 key이고, number타입의 키만 올 수 있음을 알려줘야 한다
+  const [field, direction] = sortBy.split("-") as [NumericFieldOfCabin, string];
   const modifier = direction === "asc" ? 1 : -1;
   const sortedCabins = filteredCabins.sort(
     (a, b) => (a[field] - b[field]) * modifier
