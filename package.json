@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "23.x"
+  },
   "name": "23-the-wild-oasis",
   "private": true,
   "version": "0.0.0",
