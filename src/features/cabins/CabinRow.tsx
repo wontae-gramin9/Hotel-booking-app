@@ -1,13 +1,14 @@
 import styled from "styled-components";
-import { formatCurrency } from "../../utils/helpers";
-import CreateCabinForm from "./CreateCabinForm";
-import { useDeleteCabin } from "./useDeleteCabin";
 import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
+import CreateCabinForm from "./CreateCabinForm";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import { useDeleteCabin } from "./useDeleteCabin";
 import { useCreateCabin } from "./useCreateCabin";
-import Modal from "../../ui/Modal";
-import Table from "../../ui/Table";
-import Menus from "../../ui/Menus";
-import ConfirmDelete from "./../../ui/ConfirmDelete";
+import { formatCurrency } from "@/utils/helpers";
+import Modal from "@/ui/Modal";
+import Table from "@/ui/Table";
+import Menus from "@/ui/Menus";
+import type { Cabin } from "@/types/cabin";
 
 const Img = styled.img`
   display: block;
@@ -18,7 +19,7 @@ const Img = styled.img`
   transform: scale(1.5) translateX(-7px);
 `;
 
-const Cabin = styled.div`
+const CabinComponent = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
@@ -36,7 +37,7 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
-export default function CabinRow({ cabin }) {
+export default function CabinRow({ cabin }: { cabin: Cabin }) {
   const {
     id: cabinId,
     name,
@@ -62,8 +63,9 @@ export default function CabinRow({ cabin }) {
   return (
     <Table columns={"0.6fr 1.8fr 2.2fr 1fr 1fr 1fr"}>
       <Table.Row role="row">
-        <Img src={image} />
-        <Cabin>{name}</Cabin>
+        {/* [TsMigration] image to image.name */}
+        <Img src={image as string} />
+        <CabinComponent>{name}</CabinComponent>
         <div>Fits up to {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
         {discount && <Discount>{formatCurrency(discount)}</Discount>}
@@ -71,8 +73,8 @@ export default function CabinRow({ cabin }) {
           <Modal>
             <Menus.Menu>
               {/* Toggle과 그 Toggle이 열고닫는 List를 엮는 id*/}
-              <Menus.Toggle id={cabinId} />
-              <Menus.List id={cabinId}>
+              <Menus.Toggle id={cabinId.toString()} />
+              <Menus.List id={cabinId.toString()}>
                 <Menus.Button
                   icon={<HiSquare2Stack />}
                   disabled={isEditing}
