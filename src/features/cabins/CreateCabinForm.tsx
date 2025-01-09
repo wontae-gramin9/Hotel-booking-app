@@ -1,36 +1,57 @@
-import Input from "../../ui/Input.tsx";
-import Form from "../../ui/Form";
-import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
-import FormRow from "../../ui/FormRow.tsx";
-import Textarea from "../../ui/Textarea";
+import Input from "@/ui/Input";
+import Form from "@/ui/Form";
+import Button from "@/ui/Button";
+import FileInput from "@/ui/FileInput";
+import FormRow from "@/ui/FormRow";
+import Textarea from "@/ui/Textarea";
 import { useForm } from "react-hook-form";
-import { useCreateCabin } from "./useCreateCabin";
-import { useEditCabin } from "./useEditCabin";
+import { useCreateCabin } from "./useCreateCabin.ts";
+import { useEditCabin } from "./useEditCabin.ts";
+import { Cabin, StorageFile } from "@/types/cabin.ts";
 
-function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
+// [TsMigration] useForm으로
+type CreateCabinFormData = {
+  name: string;
+  maxCapacity: number;
+  regularPrice: number;
+  discount: number;
+  description: string;
+  image: string | StorageFile[];
+};
+
+function CreateCabinForm({
+  cabinToEdit = {},
+  onCloseModal,
+}: {
+  cabinToEdit: Cabin | {};
+  onCloseModal?: () => void;
+}) {
+  // [TsMigration] 원래 2개로 나뉘어져야 할 것을 하나로 합쳤기 때문에
+  // 에러 발생하는것이 맞다
+  // @ts-expect-error
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
 
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
-    // defaultValues는 edit이 아니라 새로운걸 만들때라면 필요없다
-    defaultValues: isEditSession ? editValues : {},
-  });
+  const { register, handleSubmit, reset, getValues, formState } =
+    useForm<CreateCabinFormData>({
+      // defaultValues는 edit이 아니라 새로운걸 만들때라면 필요없다
+      defaultValues: isEditSession ? editValues : {},
+    });
   const { errors } = formState;
 
   const { isCreating, createCabin } = useCreateCabin();
   const { isEditing, editCabin } = useEditCabin();
 
-  const isWorking = isCreating | isEditing;
+  const isWorking = isCreating || isEditing;
 
-  function onSubmit(data) {
+  function onSubmit(data: CreateCabinFormData) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
     if (isEditSession)
       editCabin(
         { newCabin: { ...data, image }, id: editId },
         {
           // onSuccess를 리턴되는 mutation에도 직접 달 수 있다.
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
             onCloseModal?.();
           },
@@ -40,7 +61,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       createCabin(
         { ...data, image: data.image[0] },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
             onCloseModal?.();
           },
@@ -48,6 +69,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       );
   }
 
+  // 이거는 form 타입을 해줘야 하는 것
   return (
     <Form
       onSubmit={handleSubmit(onSubmit)}
@@ -114,7 +136,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         error={errors?.description?.message}
       >
         <Textarea
-          type="number"
           id="description"
           disabled={isWorking}
           defaultValue=""
