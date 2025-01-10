@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node and NPM Dependencies
@@ -18,7 +21,5 @@ jobs:
           working-dir: .
       - name: Test
         run: echo 'Mock test'
-        working-directory: .
       - name: Build
         run: npm run build
-        working-directory: .
