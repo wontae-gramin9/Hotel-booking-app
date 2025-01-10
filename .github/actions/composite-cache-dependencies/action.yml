@@ -1,0 +1,34 @@
+name: Cache Node and NPM Dependencies
+description: This action allows to cache both Node and NPM dependencies based on the package-lock.json file
+
+inputs:
+  node-version:
+    description: NodeJS version to use
+    default: 23.x
+    required: false
+  working-dir:
+    description: The working directory of the application
+    default: .
+    # . → current directory
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Setup NodeJS version ${{inputs.node-version}}
+      uses: actions/setup-node@v3
+      with:
+        # with은 step에 전달할 매개변수(parameter)를 지정하는 역할
+        # 따라서 actions/setup-node@v3는 node-version값에 따라 지정된 버전 설치
+        node-version: ${{inputs.node-version}}
+    - name: Cache dependencies
+      id: cache
+      uses: actions/cache@v3
+      with:
+        path: ${{inputs.working-dir}}/node_modules
+        key: node-modules-${{hashFiles('${{inputs.working-dir}}/package-lock.json')}}
+    - name: Install dependencies
+      if: ${{steps.cache.outputs.cache-hit != 'true'}}
+      run: npm ci
+      shell: bash
+      working-directory: ${{inputs.working-dir}}
