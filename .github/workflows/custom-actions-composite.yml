@@ -1,0 +1,28 @@
+name: Custom Actions - Composite
+
+on:
+  workflow_dispatch:
+
+env:
+  working-directory: .
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{env.working-directory}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node and NPM Dependencies
+        # Use our composite action (absolute path)
+        # checkout action을 먼저 사용해줘야 한다
+        uses: ./.github/actions/composite-cache-deps
+        with:
+          # custom action이 필요로하는 args
+          node-version: 23.x
+          working-dir: ${{env.working-directory}}
+      - name: Test
+        run: echo 'Mock test'
+      - name: Build
+        run: npm run build
