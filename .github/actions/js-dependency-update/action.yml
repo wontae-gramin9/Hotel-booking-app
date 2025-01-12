@@ -1,0 +1,12 @@
+# JS ACTION
+# Inspect package[-lock].json regularly & check for any updates in the dependencies
+# If any updates, create a PR with the updated files
+
+# [Convention] 폴더이름으로 목적 정하고, 파일이름은 항상 action.yml
+name: Update NPM Dependencies
+description: Checks if there are updates to NPM packages, and create a PR with the updated package*.json files.
+
+runs:
+  # JS action에서는 node version을 먼저 define한다
+  using: node23
+  main: index.js
