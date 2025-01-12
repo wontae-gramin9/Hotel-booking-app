@@ -1,0 +1,17 @@
+# To use js-dependency-update action
+# Workflow is in charge of running the action or determining the schedule.
+# Not the action itself
+
+name: Custom Actions - JS
+run-name: Custom Actions - JS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dependency-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for dependency updates
+        uses: ./.github/actions/js-dependency-update
