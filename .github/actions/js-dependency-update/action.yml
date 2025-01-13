@@ -8,5 +8,5 @@ description: Checks if there are updates to NPM packages, and create a PR with t
 
 runs:
   # JS action에서는 node version을 먼저 define한다
-  using: node23
+  using: node20
   main: dist/index.js
