@@ -2,7 +2,7 @@
 // 물론 split할 수도 있다.
 // entry function은 run()으로 이름짓는다.
 
-const core = require("@actions/core");
+import * as core from "@actions/core";
 // exec: CLI 실행, CLI 아웃풋을 action에서 사용하기 위한 유틸리티 제공
 // github: Github API와 interact
 
@@ -28,7 +28,7 @@ async function run() {
   // gh-token을 secret으로 만들어준다.
   core.setSecret(ghToken);
 
-  core.info("I am a custom JS action");
+  core.info("I am a custom JS action, written in TS");
 }
 
 run();
