@@ -6,6 +6,13 @@ import * as core from "@actions/core";
 // exec: CLI 실행, CLI 아웃풋을 action에서 사용하기 위한 유틸리티 제공
 // github: Github API와 interact
 
+// args를 object로 하는 이유 extension이 쉽기 때문에(그냥 다른 key로 넣어주면 된다)
+const validateBranchName = ({ branchName }: { branchName: string }) =>
+  /^[a-zA-Z0-9_\-\.\/]+$/.test(branchName);
+
+const validateDirectoryName = ({ dirName }: { dirName: string }) =>
+  /^[a-zA-Z0-9_\-\/]+$/.test(dirName);
+
 async function run() {
   /* 
   1. Parse inputs
@@ -24,11 +31,35 @@ async function run() {
   const targetBranch = core.getInput("target-branch");
   const ghToken = core.getInput("gh-token");
   const workingDir = core.getInput("working-directory");
-  const debug = core.getBooleanInput("debug");
+  const debug: boolean = core.getBooleanInput("debug");
   // gh-token을 secret으로 만들어준다.
   core.setSecret(ghToken);
 
-  core.info("I am a custom JS action, written in TS");
+  if (!validateBranchName({ branchName: baseBranch })) {
+    // error를 발생함과 동시에에 action의 state를 failed로 만든다
+    core.setFailed(
+      "Invalid branch name. Branch names should include only characters, numbers, hyphens, underscores, dots and forwawrd slashes."
+    );
+    return;
+  }
+
+  if (!validateBranchName({ branchName: targetBranch })) {
+    core.setFailed(
+      "Invalid target name. Branch names should include only characters, numbers, hyphens, underscores, dots and forwawrd slashes."
+    );
+    return;
+  }
+
+  if (!validateDirectoryName({ dirName: workingDir })) {
+    core.setFailed(
+      "Invalid working directory name. Directory names should include only characters, numbers, hyphens, underscores and forwawrd slashes."
+    );
+    return;
+  }
+
+  core.info(`[js-dependency-update]: base branch is ${baseBranch}`);
+  core.info(`[js-dependency-update]: target branch is ${targetBranch}`);
+  core.info(`[js-dependency-update]: working directory is ${workingDir}`);
 }
 
 run();
