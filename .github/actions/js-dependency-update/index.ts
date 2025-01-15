@@ -4,6 +4,7 @@
 
 import * as core from "@actions/core";
 // exec: CLI 실행, CLI 아웃풋을 action에서 사용하기 위한 유틸리티 제공
+import * as exec from "@actions/exec";
 // github: Github API와 interact
 
 // args를 object로 하는 이유 extension이 쉽기 때문에(그냥 다른 key로 넣어주면 된다)
@@ -60,6 +61,23 @@ async function run() {
   core.info(`[js-dependency-update]: base branch is ${baseBranch}`);
   core.info(`[js-dependency-update]: target branch is ${targetBranch}`);
   core.info(`[js-dependency-update]: working directory is ${workingDir}`);
+
+  await exec.exec("npm update", [], {
+    cwd: workingDir,
+  });
+
+  const gitStatus = await exec.getExecOutput(
+    "git status -s package*.json",
+    [],
+    {
+      cwd: workingDir,
+    }
+  );
+  if (gitStatus.stdout.length > 0) {
+    core.info("[js-dependency-update]: There are updates available!");
+  } else {
+    core.info("[js-dependency-update]: No updates at this point in time.");
+  }
 }
 
 run();
