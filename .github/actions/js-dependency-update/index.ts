@@ -62,22 +62,32 @@ async function run() {
   core.info(`[js-dependency-update]: target branch is ${targetBranch}`);
   core.info(`[js-dependency-update]: working directory is ${workingDir}`);
 
-  await exec.exec("npm update", [], {
+  const pwd = await exec.getExecOutput("pwd", [], {
     cwd: workingDir,
   });
+  core.info(pwd.stdout);
+  // if (pwd.stdout.length > 0) {
+  //   core.info("[js-dependency-update]: There are updates available!");
+  // } else {
+  //   core.info("[js-dependency-update]: No updates at this point in time.");
+  // }
 
-  const gitStatus = await exec.getExecOutput(
-    "git status -s package*.json",
-    [],
-    {
-      cwd: workingDir,
-    }
-  );
-  if (gitStatus.stdout.length > 0) {
-    core.info("[js-dependency-update]: There are updates available!");
-  } else {
-    core.info("[js-dependency-update]: No updates at this point in time.");
-  }
+  // await exec.exec("npm update", [], {
+  //   cwd: workingDir,
+  // });
+
+  // const gitStatus = await exec.getExecOutput(
+  //   "git status -s package*.json",
+  //   [],
+  //   {
+  //     cwd: workingDir,
+  //   }
+  // );
+  // if (gitStatus.stdout.length > 0) {
+  //   core.info("[js-dependency-update]: There are updates available!");
+  // } else {
+  //   core.info("[js-dependency-update]: No updates at this point in time.");
+  // }
 }
 
 run();
