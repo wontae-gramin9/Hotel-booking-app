@@ -12,7 +12,7 @@ const validateBranchName = ({ branchName }: { branchName: string }) =>
   /^[a-zA-Z0-9_\-\.\/]+$/.test(branchName);
 
 const validateDirectoryName = ({ dirName }: { dirName: string }) =>
-  /^[a-zA-Z0-9_\-\/]+$/.test(dirName);
+  /^[a-zA-Z0-9_\-\.\/]+$/.test(dirName);
 
 async function run() {
   /* 
