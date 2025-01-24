@@ -6,6 +6,7 @@ import * as core from "@actions/core";
 // exec: CLI 실행, CLI 아웃풋을 action에서 사용하기 위한 유틸리티 제공
 import * as exec from "@actions/exec";
 // github: Github API와 interact
+import * as github from "@actions/github";
 
 // args를 object로 하는 이유 extension이 쉽기 때문에(그냥 다른 key로 넣어주면 된다)
 const validateBranchName = ({ branchName }: { branchName: string }) =>
@@ -98,6 +99,24 @@ async function run() {
     await exec.exec(`git push -u origin ${targetBranch} --force`, [], {
       ...commonExecOpts,
     });
+    const oktokit = github.getOctokit(ghToken);
+    // create a pull request
+    try {
+      await oktokit.rest.pulls.create({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        title: "Update NPM dependencies",
+        body: "This pull request updates NPM packages",
+        base: baseBranch,
+        head: targetBranch,
+      });
+    } catch (e) {
+      core.error(
+        "[js-dependency-update]: Something went wrong while creating the PR. Check logs below."
+      );
+      core.setFailed(e);
+      core.error(e);
+    }
   } else {
     core.info("[js-dependency-update]: No updates at this point in time.");
   }

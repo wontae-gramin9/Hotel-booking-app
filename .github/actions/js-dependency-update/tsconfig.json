@@ -6,7 +6,8 @@
     "esModuleInterop": true, // ES 모듈 및 CommonJS 호환성 지원
     "outDir": "./dist", // 컴파일된 JS 파일의 출력 경로
     "rootDir": "./", // 소스 파일 경로
-    "skipLibCheck": true // 라이브러리 타입 검사 생략 (빌드 속도 향상)
+    "skipLibCheck": true, // 라이브러리 타입 검사 생략 (빌드 속도 향상)
+    "useUnknownInCatchVariables": false // try-catch문의 error 타입에러 suppress
   },
   "include": ["index.ts"], // 포함할 파일
   "exclude": ["node_modules"] // 제외할 파일/디렉토리
