@@ -18,6 +18,13 @@ on:
         type: string
         default: "."
 
+# Change the permissions granted to the GITHUB_TOKEN
+# Repo setting → Actions → General → Workflow permissions
+# Repo에서 옵션이 grayed out되어있으면 organization에서 바꿀 수 있다
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   dependency-update:
     runs-on: ubuntu-latest
@@ -29,3 +36,4 @@ jobs:
           base-branch: ${{inputs.base-branch}}
           target-branch: ${{inputs.target-branch}}
           working-directory: ${{inputs.working-directory}}
+          gh-token: ${{secrets.GITHUB_TOKEN}}
