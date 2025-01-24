@@ -11,6 +11,8 @@ node_modules
 # JS Action을 위한 exception
 dist/*
 !dist/index.js
+# Docker Action
+venv/
 
 dist-ssr
 *.local
