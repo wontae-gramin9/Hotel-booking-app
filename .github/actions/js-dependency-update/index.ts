@@ -28,12 +28,17 @@ async function run() {
     - Create a PR to the base-branch using octokit API(github API)
     - Otherwise, conclude the custom action
   */
-  const baseBranch = core.getInput("base-branch");
-  const targetBranch = core.getInput("target-branch");
+  const baseBranch = core.getInput("base-branch") || "default-value";
+  const targetBranch = core.getInput("target-branch", { required: true });
   const ghToken = core.getInput("gh-token");
   const workingDir = core.getInput("working-directory");
   const debug: boolean = core.getBooleanInput("debug");
   // gh-token을 secret으로 만들어준다.
+
+  const commonExecOpts = {
+    cwd: workingDir,
+  };
+
   core.setSecret(ghToken);
 
   if (!validateBranchName({ branchName: baseBranch })) {
@@ -63,18 +68,36 @@ async function run() {
   core.info(`[js-dependency-update]: working directory is ${workingDir}`);
 
   await exec.exec("npm update", [], {
-    cwd: workingDir,
+    ...commonExecOpts,
   });
 
   const gitStatus = await exec.getExecOutput(
     "git status -s package*.json",
     [],
     {
-      cwd: workingDir,
+      ...commonExecOpts,
     }
   );
   if (gitStatus.stdout.length > 0) {
     core.info("[js-dependency-update]: There are updates available!");
+
+    // [4-1] Add and commit files to the target-branch
+    // Set up git credentials
+    await exec.exec(`git config --global user.name "gh-automation"`);
+    await exec.exec(`git config --global user.email "gh-automation@gmail.com"`);
+    // checkout to targetBranch
+    await exec.exec(`git checkout -b ${targetBranch}"`, [], {
+      ...commonExecOpts,
+    });
+    await exec.exec(`git add package.json package-lock.json`, [], {
+      ...commonExecOpts,
+    });
+    await exec.exec(`git commit -m "chore: update dependencies"`, [], {
+      ...commonExecOpts,
+    });
+    await exec.exec(`git push -u origin ${targetBranch} --force`, [], {
+      ...commonExecOpts,
+    });
   } else {
     core.info("[js-dependency-update]: No updates at this point in time.");
   }
