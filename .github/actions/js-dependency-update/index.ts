@@ -8,6 +8,27 @@ import * as exec from "@actions/exec";
 // github: Github API와 interact
 import * as github from "@actions/github";
 
+const setupGitCredentials = async () => {
+  await exec.exec(`git config --global user.name "gh-automation"`);
+  await exec.exec(`git config --global user.email "gh-automation@gmail.com"`);
+};
+
+const setUpLogger = ({ debug, prefix } = { debug: false, prefix: "" }) => ({
+  info: (message: string) => {
+    if (debug) {
+      core.info(`${prefix} ${prefix ? " : " : ""}${message}`);
+    }
+  },
+  debug: (message: string) => {
+    if (debug) {
+      core.info(`DEBUG ${prefix} ${prefix ? " : " : ""}${message}`);
+    }
+  },
+  error: (message: string) => {
+    core.error(`${prefix} ${prefix ? " : " : ""}${message}`);
+  },
+});
+
 // args를 object로 하는 이유 extension이 쉽기 때문에(그냥 다른 key로 넣어주면 된다)
 const validateBranchName = ({ branchName }: { branchName: string }) =>
   /^[a-zA-Z0-9_\-\.\/]+$/.test(branchName);
@@ -19,7 +40,7 @@ async function run() {
   /* 
   1. Parse inputs
     - 1. base-branch (from which to check for updates)
-    - 2. Target branch (to use to create the PR)
+    - 2. head branch (to use to create the PR)
     - 3. Github Token for auth purposes (to create PRs)
     - 4. Working directory for which to check for dependencies
   2. Execute the npm update command within the working directory
@@ -30,10 +51,12 @@ async function run() {
     - Otherwise, conclude the custom action
   */
   const baseBranch = core.getInput("base-branch") || "default-value";
-  const targetBranch = core.getInput("target-branch", { required: true });
+  const headBranch = core.getInput("head-branch", { required: true });
+
   const ghToken = core.getInput("gh-token");
   const workingDir = core.getInput("working-directory");
   const debug: boolean = core.getBooleanInput("debug");
+  const logger = setUpLogger({ debug, prefix: "[js-dependency-update]" });
   // gh-token을 secret으로 만들어준다.
 
   const commonExecOpts = {
@@ -42,6 +65,9 @@ async function run() {
 
   core.setSecret(ghToken);
 
+  logger.debug(
+    "Validating inputs - base-branch, head-branch, working-directory"
+  );
   if (!validateBranchName({ branchName: baseBranch })) {
     // error를 발생함과 동시에에 action의 state를 failed로 만든다
     core.setFailed(
@@ -50,9 +76,9 @@ async function run() {
     return;
   }
 
-  if (!validateBranchName({ branchName: targetBranch })) {
+  if (!validateBranchName({ branchName: headBranch })) {
     core.setFailed(
-      "Invalid target name. Branch names should include only characters, numbers, hyphens, underscores, dots and forwawrd slashes."
+      "Invalid head name. Branch names should include only characters, numbers, hyphens, underscores, dots and forwawrd slashes."
     );
     return;
   }
@@ -64,9 +90,10 @@ async function run() {
     return;
   }
 
-  core.info(`[js-dependency-update]: base branch is ${baseBranch}`);
-  core.info(`[js-dependency-update]: target branch is ${targetBranch}`);
-  core.info(`[js-dependency-update]: working directory is ${workingDir}`);
+  logger.debug(`base branch is ${baseBranch}`);
+  logger.debug(`head branch is ${headBranch}`);
+  logger.debug(`working directory is ${workingDir}`);
+  logger.debug(`Checking for package updates`);
 
   await exec.exec("npm update", [], {
     ...commonExecOpts,
@@ -80,14 +107,9 @@ async function run() {
     }
   );
   if (gitStatus.stdout.length > 0) {
-    core.info("[js-dependency-update]: There are updates available!");
-
-    // [4-1] Add and commit files to the target-branch
-    // Set up git credentials
-    await exec.exec(`git config --global user.name "gh-automation"`);
-    await exec.exec(`git config --global user.email "gh-automation@gmail.com"`);
-    // checkout to targetBranch
-    await exec.exec(`git checkout -b ${targetBranch}"`, [], {
+    logger.debug("There are updates available!");
+    await setupGitCredentials();
+    await exec.exec(`git checkout -b ${headBranch}"`, [], {
       ...commonExecOpts,
     });
     await exec.exec(`git add package.json package-lock.json`, [], {
@@ -96,29 +118,27 @@ async function run() {
     await exec.exec(`git commit -m "chore: update dependencies"`, [], {
       ...commonExecOpts,
     });
-    await exec.exec(`git push -u origin ${targetBranch} --force`, [], {
+    await exec.exec(`git push -u origin ${headBranch} --force`, [], {
       ...commonExecOpts,
     });
-    const oktokit = github.getOctokit(ghToken);
-    // create a pull request
+    const octokit = github.getOctokit(ghToken);
     try {
-      await oktokit.rest.pulls.create({
+      await octokit.rest.pulls.create({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         title: "Update NPM dependencies",
         body: "This pull request updates NPM packages",
         base: baseBranch,
-        head: targetBranch,
+        head: headBranch,
       });
     } catch (e) {
-      core.error(
-        "[js-dependency-update]: Something went wrong while creating the PR. Check logs below."
+      logger.error(
+        `Something went wrong while creating the PR. Check logs below. \nError: ${e}`
       );
       core.setFailed(e);
-      core.error(e);
     }
   } else {
-    core.info("[js-dependency-update]: No updates at this point in time.");
+    logger.info("No updates at this point in time.");
   }
 }
 

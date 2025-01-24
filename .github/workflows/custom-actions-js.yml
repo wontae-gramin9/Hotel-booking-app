@@ -3,7 +3,7 @@
 # Not the action itself
 
 name: Custom Actions - JS
-run-name: Custom Actions - JS | BB - ${{inputs.base-branch}} TB - ${{inputs.target-branch}} - WD ${{inputs.working-directory}}
+run-name: Custom Actions - JS | BB - ${{inputs.base-branch}} TB - ${{inputs.head-branch}} - WD ${{inputs.working-directory}}
 
 on:
   workflow_dispatch:
@@ -11,12 +11,15 @@ on:
       base-branch:
         type: string
         default: main
-      target-branch:
+      head-branch:
         type: string
         default: update-dependencies
       working-directory:
         type: string
         default: "."
+      debug:
+        type: boolean
+        default: false
 
 # Change the permissions granted to the GITHUB_TOKEN
 # Repo setting → Actions → General → Workflow permissions
@@ -34,6 +37,7 @@ jobs:
         uses: ./.github/actions/js-dependency-update
         with:
           base-branch: ${{inputs.base-branch}}
-          target-branch: ${{inputs.target-branch}}
+          head-branch: ${{inputs.head-branch}}
           working-directory: ${{inputs.working-directory}}
           gh-token: ${{secrets.GITHUB_TOKEN}}
+          debug: ${{inputs.debug}}
