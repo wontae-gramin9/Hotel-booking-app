@@ -3,11 +3,15 @@ description: Ping URL until maximum trials have exceeded. If result is not 200 u
 # Ping the url and make sure it works before we proceed with our workflow
 
 inputs:
+  # 파이썬에서는 JS처럼 core패키지가 없는 대신 인풋값을 받아오는 convention이 있다
+  # main.py에서 INPUT_URL처럼 INPUT_{대문자변수} 로 가져올 수 있다
+  # bash에서는 INPUT_MAX-TRAILS처럼 -는 안 된다.
   url:
     description: URL to ping.
     required: true
   max_trials:
     description: Maximum number of trials until action fails.
+    # Env variable은 string으로 들어온다.
     default: "10"
     required: false
   delay:
