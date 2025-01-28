@@ -24,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node and NPM Dependencies
+        id: setup-deps
         # Use our composite action (absolute path)
         # checkout action을 먼저 사용해줘야 한다
         uses: ./.github/actions/composite-cache-dependencies
@@ -32,6 +33,10 @@ jobs:
           node-version: 23.x
           working-dir: ${{env.working-directory}}
           target-env: ${{inputs.target-env}}
+      - name: Print setup deps output
+        run: |
+          echo "Installed dependencies: ${{steps.setup-deps.outputs.installed-deps}}"
+
       - name: Test
         run: echo 'Mock test'
       - name: Build
