@@ -106,7 +106,13 @@ async function run() {
       ...commonExecOpts,
     }
   );
+
+  let updatesAvailable = false;
   if (gitStatus.stdout.length > 0) {
+    updatesAvailable = true;
+    logger.debug("Setting updates-available output to true");
+    core.setOutput("updates-available", true);
+
     logger.debug("There are updates available!");
     await setupGitCredentials();
     await exec.exec(`git checkout -b ${headBranch}"`, [], {
@@ -140,6 +146,9 @@ async function run() {
   } else {
     logger.info("No updates at this point in time.");
   }
+
+  logger.info(`Setting updates-available output to ${updatesAvailable}`);
+  core.setOutput("updates-available", true);
 }
 
 run();

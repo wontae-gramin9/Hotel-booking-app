@@ -24,7 +24,11 @@ inputs:
     required: true
   debug:
     description: Whether the output debug messages to the console
-    default: false
+    default: "false"
+
+outputs:
+  updates-available:
+    description: Whether there are updates available
 
 runs:
   # JS action에서는 node version을 먼저 define한다
