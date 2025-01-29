@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    // Vitest browser test를 위한 TypeScript Type
+    "types": ["@vitest/browser/providers/playwright"],
     // 경로 별칭 설정
     "baseUrl": "./",
     "paths": {
