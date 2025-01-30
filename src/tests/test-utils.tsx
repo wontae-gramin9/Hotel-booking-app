@@ -8,18 +8,29 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000,
+      retry: false,
     },
   },
 });
+
+const QueryClientWrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+);
 
 // https://testing-library.com/docs/react-testing-library/setup#custom-render
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <DarkModeProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>{children}</BrowserRouter>
-      </QueryClientProvider>
+      <QueryClientWrapper>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          {children}
+        </BrowserRouter>
+      </QueryClientWrapper>
     </DarkModeProvider>
   );
 };
