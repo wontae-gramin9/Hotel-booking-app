@@ -10,8 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:browser": "vitest --workspace=vitest.workspace.ts"
+    "test": "npx vitest --browser.headless"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
